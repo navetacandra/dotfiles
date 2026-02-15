@@ -14,6 +14,10 @@ update_dns() {
 	sudo resolvconf -u
 }
 
-PS1='[\u@\h \W] % '
+nixenv() {
+	nix develop ~/nix#$1
+}
+
+PS1='[\033[1m\033[0;36m\u\033[0m@\033[1;32m\h \033[1;34m\W\033[0m] % '
 
 export PATH=$HOME/.local/bin:$PATH
