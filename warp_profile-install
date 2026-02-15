@@ -1,0 +1,15 @@
+#!/bin/sh
+
+data=$(curl -s https://api.github.com/repos/ViRb3/wgcf/releases/latest | grep linux_amd64 | cut -d : -f 2,3 | tr -d \",)
+filename=$(echo $data | awk '{print $1}')
+url=$(echo $data | awk '{print $2}')
+echo $filename
+echo $url
+wget $url
+chmod +x $filename
+"./$filename" register --accept-tos
+"./$filename" generate
+
+rm wgcf-account.toml
+rm $filename
+sudo mv wgcf-profile.conf /etc/wireguard/warp.conf

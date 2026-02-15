@@ -1,0 +1,43 @@
+#!/usr/bin/sh
+
+cpu_load() {
+    echo $(grep -o "^[^ ]*" /proc/loadavg)
+}
+
+cpu_temp() {
+    echo $(($(cat /sys/class/thermal/thermal_zone0/temp)/1000))
+}
+
+ram_stat() {
+    local stat="$(free -h | awk '/Mem:/ ')"
+    local used=$(echo "$stat" | awk '{print $3}')
+    local total=$(echo "$stat" | awk '{print $2}')
+    echo "$used/$total"
+}
+
+net_stat_file() {
+    local file="$(cat /proc/net/dev)"
+    local d=$(echo "$file" | awk '$1 ~ /:$/ && $1 != "lo:" {sum += $2} END {print sum}')
+    local u=$(echo "$file" | awk '$1 ~ /:$/ && $1 != "lo:" {sum += $10} END {print sum}')
+    echo "$d $u"
+}
+
+net_stat() {
+    local ns1="$(net_stat_file)"
+    sleep 1
+    local ns2="$(net_stat_file)"
+    local d1=$(echo "$ns1" | awk '{print $1}')
+    local u1=$(echo "$ns1" | awk '{print $2}')
+    local d2=$(echo "$ns2" | awk '{print $1}')
+    local u2=$(echo "$ns2" | awk '{print $2}')
+    echo "$(($d2-d1)) $(($u2-u1))"
+}
+
+sysinfo() {
+    local net=$(net_stat)
+    local download=$(echo $net | awk '{print $1}')
+    local upload=$(echo $net | awk '{print $2}')
+    echo "CPU: $(cpu_load)% | Temp: $(cpu_temp)℃ | RAM: $(ram_stat) | Download: $(($download/1000))Kbps | Upload: $(($upload/1000))Kbps"
+}
+
+sysinfo

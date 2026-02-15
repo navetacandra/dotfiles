@@ -1,0 +1,11 @@
+#!/bin/sh
+
+data=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | grep linux-x86_64 | cut -d : -f 2,3 | tr -d \",)
+filename=$(echo $data | awk '{print $1}')
+url=$(echo $data | awk '{print $2}')
+
+wget $url \
+	&& tar xf $filename \
+	&& rm $filename \
+	&& sudo mv zen /opt/zen \
+	&& sudo ln -s /opt/zen/zen /bin/zen

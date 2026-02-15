@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if pgrep -x wireplumber; then
+	pkill wireplumber
+fi
+
+if pgrep -x pipewire-pulse; then
+	pkill pipewire-pulse
+fi
+
+if pgrep -x pipewire; then
+	pkill pipewire
+fi
